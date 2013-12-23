@@ -32,8 +32,9 @@ set(H2,'LineStyle',':','Marker','*')
 % plot(1:size(e,1), e, 'or'); axis tight;
 % subplot(3,1,3);
 % plot(1:size(f,1), f, '*g'); axis tight;
-
-%% Búsqueda de picos asistida por [f centros]
+%% Búsqueda de picos (periodos fundamentales)
+% El valor 100 para MINPEAKDISTANCE parece funcionar bien. Si dejara de ser
+% así, se puede ayudar de la frecuencia fundamental detectada
 [picosTemp indsTemp] = findpeaks(a, 'MINPEAKDISTANCE', 100);
 nPicos = size(picosTemp,1);
 picos = [];
@@ -52,6 +53,17 @@ figure(3)
 plot(a,'g.-');
 hold on
 plot(inds, picos, 'ob');
-%% Enventanado de la señal entera
+%% Procesado de las ventanas
+res = zeros(numS, 1);
+for i = 1:size(v, 1)-3
+    vent = v(i,:);
+    if f(i) > 0
+        % Procesamos
+    end
+    vent = vent.*hann(l, 'symmetric')';
+    res(1+(i-1)*ss:(i-1)*ss+l,1) = res(1+(i-1)*ss:(i-1)*ss+l,1)+vent';
+end
+
+    
 
 
