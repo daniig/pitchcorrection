@@ -10,12 +10,13 @@ c = aloc(a,1,numS,l,ss,2,1);
 v = aloc(a,1,numS,l,ss,3,0);
 [f centros] = frecuencias(c,e,Fs,70,500,0.9,ss);
 %% Búsqueda de frecuencias deseadas
-fDeseadas = zeros(size(f,1));
+fDeseadas = zeros(size(f,1),1);
 for i = 1:size(f,1)
     fDeseadas(i) = fAdjust(f(i));
 end
 figure(4)
-plot(centros, f, '*g', centros, fDeseadas, 'ob');
+%plot(centros, f, '*g', centros, fDeseadas, 'ob');
+plot(1:size(f,1), f, '*g', 1:size(f,1), fDeseadas, 'ob');
 
 %% Pintado
 figure(2)
@@ -32,6 +33,8 @@ set(H2,'LineStyle',':','Marker','*')
 % plot(1:size(e,1), e, 'or'); axis tight;
 % subplot(3,1,3);
 % plot(1:size(f,1), f, '*g'); axis tight;
+%% Búsqueda de ventanas contiguas con la misma freq. fund.
+fSpans = findFreqSpans(fDeseadas);
 %% Búsqueda de picos (periodos fundamentales)
 % El valor 100 para MINPEAKDISTANCE parece funcionar bien. Si dejara de ser
 % así, se puede ayudar de la frecuencia fundamental detectada
@@ -48,21 +51,13 @@ for i = 1:nPicos
         inds = [inds indsTemp(i)];
     end
 end       
+nPicos = size(picos,2);
         
 figure(3)
 plot(a,'g.-');
 hold on
 plot(inds, picos, 'ob');
-%% Procesado de las ventanas
-res = zeros(numS, 1);
-for i = 1:size(v, 1)-3
-    vent = v(i,:);
-    if f(i) > 0
-        % Procesamos
-    end
-    vent = vent.*hann(l, 'symmetric')';
-    res(1+(i-1)*ss:(i-1)*ss+l,1) = res(1+(i-1)*ss:(i-1)*ss+l,1)+vent';
-end
+
 
     
 

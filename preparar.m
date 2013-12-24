@@ -1,4 +1,5 @@
 clear all
+close all
 [a, Fs] = wavread('cancion.wav');
 pl = audioplayer(a,Fs);
 L = 1024;   % Longitud de las ventanas
