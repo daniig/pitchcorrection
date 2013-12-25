@@ -11,5 +11,5 @@ for i = 2:length(freqs)
         f = freqs(i);
     end
 end
-spans = [spans ; vIni length(freqs)];
+spans = [spans ; vIni length(freqs)-1];
     
