@@ -14,15 +14,14 @@ fDeseadas = zeros(size(f,1),1);
 for i = 1:size(f,1)
     fDeseadas(i) = fAdjust(f(i));
 end
-figure(4)
-%plot(centros, f, '*g', centros, fDeseadas, 'ob');
-plot(1:size(f,1), f, '*g', 1:size(f,1), fDeseadas, 'ob');
+% figure(4)
+% plot(centros, f, '*g', centros, fDeseadas, 'ob');
+% plot(1:size(f,1), f, '*g', 1:size(f,1), fDeseadas, 'ob');
 
 %% Pintado
-figure(2)
-[AX,H1,H2] = plotyy(1:numS,a,centros,f,'plot');
-set(H2,'LineStyle',':','Marker','*')
-
+% figure(2)
+% [AX,H1,H2] = plotyy(1:numS,a,centros,f,'plot');
+% set(H2,'LineStyle',':','Marker','*')
 % figure(1)
 % subplot(3,1,1);
 % plot(1:numS, a);
@@ -36,34 +35,30 @@ set(H2,'LineStyle',':','Marker','*')
 %% Búsqueda de ventanas contiguas con la misma freq. fund.
 vSpans = findFreqSpans(fDeseadas);
 %% Búsqueda de picos (periodos fundamentales)
-% El valor 100 para MINPEAKDISTANCE parece funcionar bien. Si dejara de ser
-% así, se puede ayudar de la frecuencia fundamental detectada
-[picosTemp indsTemp] = findpeaks(a, 'MINPEAKDISTANCE', 100);
-nPicos = size(picosTemp,1);
-picos = [];
-inds = [];
-% Cogemos solo los picos que estén en zonas con periodicidad y que estén
-% por encima de cero
-for i = 1:nPicos
-    nVent = floor(indsTemp(i)/ss);
-    if nVent > 0 && f(nVent) > 0 && picosTemp(i) > 0
-        picos = [picos picosTemp(i)];
-        inds = [inds indsTemp(i)];
-    end
-end       
-nPicos = size(picos,2);
-        
-figure(3)
-plot(a,'g.-');
-hold on
-plot(inds, picos, 'ob');
-%% Separación y suavizado de los bordes de los spans
+% % El valor 100 para MINPEAKDISTANCE parece funcionar bien. Si dejara de ser
+% % así, se puede ayudar de la frecuencia fundamental detectada
+% [picosTemp indsTemp] = findpeaks(a, 'MINPEAKDISTANCE', 100);
+% nPicos = size(picosTemp,1);
+% picos = [];
+% inds = [];
+% % Cogemos solo los picos que estén en zonas con periodicidad y que estén
+% % por encima de cero
+% for i = 1:nPicos
+%     nVent = floor(indsTemp(i)/ss);
+%     if nVent > 0 && f(nVent) > 0 && picosTemp(i) > 0
+%         picos = [picos picosTemp(i)];
+%         inds = [inds indsTemp(i)];
+%     end
+% end       
+% nPicos = size(picos,2);
+%         
+% figure(3)
+% plot(a,'g.-');
+% hold on
+% plot(inds, picos, 'ob');
+%% Separación de los spans
 nSpans = size(vSpans,1);
 spans = cell(nSpans,1);
-vFade = hann((l-ss)*2,'symmetric');
-lFade = floor(length(vFade)/2);
-iniFade = vFade(1:lFade);
-finFade = vFade(end-lFade+1:end);
 for i = 1:nSpans
     vIni = vSpans(i,1);     % Ventanas inicial y final
     vFin = vSpans(i,2);
@@ -75,7 +70,26 @@ for i = 1:nSpans
     spans{i} = a(sIni:sFin);
     % fprintf('Ventana %i: de %i a %i\n\r', i, sIni, sFin);
 end
-%% Fades en los bordes
+%% Corrección de frecuencia en spans sonoros
+for i = 1:nSpans
+    if vSpans(i,3) ~= 0
+%         fprintf('span i=%d',i);
+%         figure(40)
+%         plot(1:length(spans{i}), spans{i}, 'r');
+%         dbstop if error
+        spans{i} = corregirSpan(spans{i}, vSpans(i,3), Fs);
+%         hold on
+%         plot(1:length(spans{i}), spans{i}, 'g');
+%         title(i);
+%         pause
+%         close(40)
+    end
+end
+%% Fades en los extremos
+vFade = hann((l-ss)*2,'symmetric');
+lFade = floor(length(vFade)/2);
+iniFade = vFade(1:lFade);
+finFade = vFade(end-lFade+1:end);
 for i = 1:nSpans
     spans{i}(1:lFade) = spans{i}(1:lFade).*iniFade;
     spans{i}(end-lFade+1:end) = spans{i}(end-lFade+1:end).*finFade;
@@ -92,7 +106,3 @@ for i = 1:nSpans
     end
     aR(sIni:sFin) = aR(sIni:sFin)+spans{i};
 end
-
-    
-
-

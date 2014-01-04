@@ -6,10 +6,10 @@ f = freqs(1);   % freq. del span actual
 for i = 2:length(freqs)
     if f ~= freqs(i)
         % Fin del span
-        spans = [spans ; vIni i-1];
+        spans = [spans ; vIni i-1 f];
         vIni = i;
         f = freqs(i);
     end
 end
-spans = [spans ; vIni length(freqs)-1];
+spans = [spans ; vIni length(freqs)-1 f];
     
